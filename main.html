@@ -1,0 +1,281 @@
+<!--
+  给妈妈的「每日一知」
+  ─────────────────────────────────────────────
+  ❤️ 只用改下面这几行，就变成专属于妈妈的小应用：
+  1) MOM_NAME      改成妈妈的名字，比如 "秀兰" / "亲爱的妈妈"
+  2) SIGNED_BY     落款，比如 "—— 爱你的女儿"
+  3) PHOTO_URL     一张全家福的网址（留空就显示温馨占位框）
+  4) WORDS_TO_MOM  想对妈妈说的几句话，会在底部轮流出现
+
+  💡 想加内容？往 CARDS 列表里照着格式添就行：
+     {c:"shi", t:"标题", b:"正文", do:"今天的小事"}
+     c 是主题：jing风景 / yue老歌 / shi美食 / shu诗画 / yang养生
+  ─────────────────────────────────────────────
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>给妈妈的每日一知</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#f6efe3;--paper-2:#efe5d3;--ink:#33302b;--ink-soft:#6b6457;--line:#d8ccb4;--accent:#9a5b4f;--accent-soft:#9a5b4f22;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{font-family:"Noto Serif SC",serif;color:var(--ink);min-height:100%;background:radial-gradient(120% 80% at 50% -10%, #fbf6ec 0%, var(--paper) 45%, var(--paper-2) 100%);display:flex;justify-content:center;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);-webkit-font-smoothing:antialiased;}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");}
+  .app{position:relative;z-index:1;width:100%;max-width:440px;padding:30px 26px 38px;display:flex;flex-direction:column;gap:22px;}
+  .hello{opacity:0;animation:rise .8s .05s forwards;}
+  .hello .greet{font-family:"Ma Shan Zheng",cursive;font-size:38px;line-height:1.2;}
+  .hello .greet .name{color:var(--accent);}
+  .hello .sub{margin-top:4px;font-size:15px;color:var(--ink-soft);letter-spacing:.5px;}
+  .datebar{opacity:0;animation:rise .8s .15s forwards;display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .datebar .solar{display:flex;align-items:baseline;gap:8px;}
+  .datebar .day{font-family:"Ma Shan Zheng",cursive;font-size:56px;line-height:.9;color:var(--accent);}
+  .datebar .ym{font-size:15px;color:var(--ink-soft);}
+  .datebar .right{text-align:right;}
+  .datebar .week{font-size:16px;font-weight:500;}
+  .datebar .lunar{font-size:15px;color:var(--ink-soft);margin-top:3px;}
+  .festival{display:inline-block;margin-top:8px;padding:3px 12px;border-radius:20px;background:var(--accent);color:#fff;font-size:14px;letter-spacing:1px;box-shadow:0 4px 12px var(--accent-soft);}
+  .photo{opacity:0;animation:rise .8s .25s forwards;display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.45);border:1px solid var(--line);}
+  .photo .frame{width:62px;height:62px;border-radius:14px;flex:0 0 auto;overflow:hidden;border:2px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#efe5d3,#e3d6bd);cursor:pointer;}
+  .photo .frame img{width:100%;height:100%;object-fit:cover;}
+  .photo .frame .ph{font-size:26px;}
+  .photo .ptxt .t{font-size:16px;font-weight:600;}
+  .photo .ptxt .d{font-size:13px;color:var(--ink-soft);margin-top:2px;}
+  .card{opacity:0;animation:rise .8s .35s forwards;position:relative;border-radius:24px;padding:28px 26px 26px;background:linear-gradient(160deg,#fffdf8,#f3ead9);border:1px solid var(--line);box-shadow:0 18px 40px -18px rgba(70,55,35,.4), inset 0 1px 0 #ffffffcc;overflow:hidden;}
+  .card::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border:1px solid var(--accent);border-radius:50%;opacity:.12;}
+  .badge{display:inline-flex;align-items:center;gap:7px;font-size:14px;letter-spacing:2px;color:var(--accent);font-weight:600;margin-bottom:14px;}
+  .badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);}
+  .card .title{font-size:25px;font-weight:700;line-height:1.4;margin-bottom:14px;}
+  .card .body{font-size:19px;line-height:1.95;color:#494339;}
+  .todo{margin-top:22px;padding-top:18px;border-top:1px dashed var(--line);}
+  .todo-label{font-size:13px;letter-spacing:3px;color:var(--accent);font-weight:600;margin-bottom:8px;}
+  .todo-text{font-size:17px;line-height:1.7;color:#5a5347;}
+  .todo-btn{margin-top:14px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:inherit;font-size:15px;font-weight:600;padding:9px 20px;border-radius:22px;cursor:pointer;transition:all .15s ease;}
+  .todo-btn:active{transform:scale(.95);}
+  .todo-btn.done{background:var(--accent);color:#fff;}
+  .todo-resp{font-size:15px;color:var(--accent);margin-top:12px;min-height:1.2em;font-style:italic;opacity:0;transition:opacity .4s ease;}
+  .todo-resp.show{opacity:1;}
+  .seal{position:absolute;right:24px;top:26px;font-family:"Ma Shan Zheng",cursive;font-size:15px;color:var(--accent);opacity:.5;}
+  .swap{transition:opacity .35s ease, transform .35s ease;}
+  .swap.out{opacity:0;transform:translateY(8px);}
+  .controls{opacity:0;animation:rise .8s .45s forwards;display:flex;gap:12px;}
+  .btn{flex:1;border:none;cursor:pointer;font-family:inherit;padding:15px;border-radius:16px;font-size:17px;font-weight:600;transition:transform .12s ease;}
+  .btn:active{transform:scale(.96);}
+  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 8px 20px -6px var(--accent);}
+  .btn.ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--line);flex:0 0 56px;}
+  .words{opacity:0;animation:rise .8s .55s forwards;text-align:center;margin-top:6px;}
+  .words .w{font-size:16px;color:var(--ink-soft);line-height:1.7;min-height:1.7em;font-style:italic;}
+  .words .by{margin-top:10px;font-family:"Ma Shan Zheng",cursive;font-size:18px;color:var(--accent);}
+  @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+</style>
+
+<div class="app">
+  <div class="hello">
+    <div class="greet"><span id="greetWord">早上好</span>，<span class="name" id="momName">妈妈</span></div>
+    <div class="sub" id="sub"></div>
+  </div>
+  <div class="datebar">
+    <div class="solar"><div class="day" id="dDay">1</div><div class="ym" id="dYM"></div></div>
+    <div class="right"><div class="week" id="dWeek"></div><div class="lunar" id="dLunar"></div><div id="festWrap"></div></div>
+  </div>
+  <div class="photo">
+    <div class="frame" id="photoFrame"><span class="ph">🏡</span></div>
+    <div class="ptxt"><div class="t" id="photoT">今天也想你了</div><div class="d">点一下这里，看看我们的合照</div></div>
+  </div>
+  <div class="card">
+    <div class="seal">每日一知</div>
+    <div class="swap" id="cardSwap">
+      <div class="badge"><span class="dot"></span><span id="cat"></span></div>
+      <div class="title" id="cTitle"></div>
+      <div class="body" id="cBody"></div>
+      <div class="todo">
+        <div class="todo-label">今 天 的 小 事</div>
+        <div class="todo-text" id="todoText"></div>
+        <button class="todo-btn" id="doneBtn">我做啦 ☺</button>
+        <div class="todo-resp" id="todoResp"></div>
+      </div>
+    </div>
+  </div>
+  <div class="controls">
+    <button class="btn ghost" id="prevBtn">←</button>
+    <button class="btn primary" id="nextBtn">再看一条 →</button>
+  </div>
+  <div class="words"><div class="w" id="word"></div><div class="by" id="signedBy">—— 爱你的孩子</div></div>
+</div>
+
+<script>
+/* ════════ 在这里改成专属妈妈的内容 ════════ */
+const MOM_NAME = "丁bo";
+const SIGNED_BY = "—— 女";
+const PHOTO_URL = "";
+const WORDS_TO_MOM = [
+  "记得按时吃饭，别总惦记着我。",
+  "今天也要开开心心的呀。",
+  "看到好玩的，记得讲给老姐妹们听。",
+  "想我了就给我打个电话。",
+  "你年轻时候比谁都爱学新东西，现在也一样。"
+];
+/* ══════════════════════════════════════════ */
+
+const PALETTE={jing:"#3f6f6b",yue:"#7d4a6e",shi:"#b06a30",shu:"#3a5a86",yang:"#5a7a45"};
+const CATNAME={jing:"风景 · 远方",yue:"乐音 · 旧曲",shi:"人间 · 滋味",shu:"诗画 · 翰墨",yang:"养生 · 日常"};
+const DONE_WORDS=["今天也过得有滋有味。","你呀，就是这么会生活。","记一笔，今天没辜负。","真好，又是踏实的一天。","这份心情，比什么都金贵。","慢慢来，日子就是这么过出味儿的。"];
+
+const CARDS=[
+  {c:"jing",t:`郁金香的来历`,b:`很多人以为郁金香是荷兰的花，其实它老家在土耳其。名字来自波斯语里的「头巾」，因为花苞圆鼓鼓的，正像缠在头上的布。`,do:`在窗台摆一盆花，或翻翻手机里以前拍的花照片。`},
+  {c:"jing",t:`极光为什么是绿的`,b:`那片飘动的绿光，是太阳吹来的小粒子撞上高空的气体才发亮。运气好时还能看到淡淡的紫和红。`,do:`今晚抬头看看天，找一找最亮的那颗星。`},
+  {c:"jing",t:`断桥其实没断`,b:`西湖的「断桥残雪」，桥从没断过。雪化时，桥背朝阳那面先露出来，远看像断了一截，名字就这么来的。`,do:`跟老姐妹聊聊，你最想再去一次的地方。`},
+  {c:"jing",t:`大地的指纹`,b:`云南红河的哈尼梯田顺着山势盘了上千级。春天灌满水，一层层映着天光，像大地一圈圈的指纹。`,do:`翻翻相册，挑一张你拍过最美的风景。`},
+  {c:"jing",t:`富士山的雪`,b:`照片里富士山下总开满樱花，其实那是在山脚拍的。山顶一年大半时间盖着雪，难得露真容。`,do:`想想这辈子去过最远的地方，讲给家里人听。`},
+  {c:"jing",t:`月亮的背面`,b:`我们一辈子看到的，永远是月亮的同一面。它转一圈正好也自转一圈，背面要飞到月亮后头才看得见。`,do:`今晚看看月亮，是圆是缺？`},
+  {c:"jing",t:`彩虹是个整圆`,b:`彩虹其实是一个完整的圆，站在地上只能看到半圈。坐飞机往下看，有时能看到一整环。`,do:`下次雨后，背对太阳找找彩虹。`},
+  {c:"jing",t:`蒲公英的旅行`,b:`一朵蒲公英能放出上百颗带绒毛的种子，乘着风能飘出去好几里地，落到哪儿就在哪儿安家。`,do:`看到蒲公英，吹一口，许个愿。`},
+  {c:"jing",t:`大海为什么是蓝的`,b:`海水把阳光里的红光暖光都悄悄吸走了，剩下蓝光反射回来，所以我们看着它是蓝盈盈的。`,do:`翻出一张海边的照片看看。`},
+  {c:"jing",t:`树的年轮`,b:`树干里一圈一圈的纹，一圈就是一年。雨水足的年份那圈就宽，旱的年份就窄，一棵树把岁月都记下了。`,do:`散步时找棵大树，猜猜它多大岁数。`},
+  {c:"jing",t:`没有两片一样的雪`,b:`每一片雪花都是六个角，而且据说世上没有两片长得一模一样，每一片都是独一份。`,do:`下次下雪，接一片在手上仔细看看。`},
+
+  {c:"yue",t:`茉莉花走向世界`,b:`这首江苏小调一百多年前传到欧洲。作曲家普契尼很喜欢，把它写进了名歌剧《图兰朵》，全世界都听过。`,do:`哼一段你年轻时最爱的歌。`},
+  {c:"yue",t:`钢琴的八十八个键`,b:`一架钢琴有八十八个键，黑白相间。这个数目正好罩住人耳最爱听的那一段音，再高再低听着就不舒服了。`,do:`找一首老歌放来听，跟着轻轻打拍子。`},
+  {c:"yue",t:`两根弦的二胡`,b:`二胡只两根弦，可在好手指下能拉出马蹄声、鸟叫、人的哭和笑。《二泉映月》就是这么一弓弓拉出来的。`,do:`想想你最爱的一首民乐，搜来听一听。`},
+  {c:"yue",t:`声音被刻了下来`,b:`一百多年前，人们头一回把声音「刻」进圆盘里。针一划过，唱的人明明不在，歌却又响起来。`,do:`给老朋友放一首你俩都喜欢的歌。`},
+  {c:"yue",t:`古琴觅知音`,b:`古琴有三千多年了。伯牙弹《高山流水》，只有钟子期听得懂，子期走后他就再不弹了——这才有了「知音」。`,do:`搜《高山流水》听一段。`},
+  {c:"yue",t:`脸谱里的人物`,b:`京剧脸谱，红脸是忠义的关公，白脸是奸诈的曹操，黑脸是刚直的包公——颜色一看，性子就摆在脸上了。`,do:`找段京剧看看，认认脸谱。`},
+  {c:"yue",t:`天下的摇篮曲`,b:`全世界的妈妈哄孩子，调子都是慢慢悠悠、轻轻往下落的，孩子听着听着眼皮就重了。`,do:`哼一段你当年哄孩子时唱过的调子。`},
+  {c:"yue",t:`口哨的把戏`,b:`吹口哨，是嘴唇和气流在玩游戏。会吹的人，能把一整首歌清清亮亮地吹出来。`,do:`试试吹段口哨，找回小时候的感觉。`},
+
+  {c:"shi",t:`西红柿曾被当毒物`,b:`西红柿刚到欧洲时，人人怕它有毒，只敢当花摆着看。这一看就是两百年，后来才有人尝了一口，从此上了餐桌。`,do:`今天做一道带西红柿的菜。`},
+  {c:"shi",t:`饺子原是一味药`,b:`相传医圣张仲景见乡亲冬天冻坏了耳朵，用面皮包上驱寒的料煮给大家吃，形状像耳朵，叫「娇耳」。`,do:`哪天有空，包顿饺子犒劳自己。`},
+  {c:"shi",t:`红茶绿茶是一家`,b:`红茶绿茶长在同一种茶树上。区别只在做法：绿茶赶紧杀青留住青翠，红茶让它慢慢发酵，就成了暖红色。`,do:`泡一杯茶，看茶叶在水里慢慢舒展。`},
+  {c:"shi",t:`巧克力本是苦的`,b:`最早的巧克力不是甜点，是古代美洲人喝的饮料，又苦又香还加辣椒。后来添了糖和奶，才成了今天甜甜的样子。`,do:`给自己买块巧克力，尝尝甜。`},
+  {c:"shi",t:`辣椒是个新来的`,b:`川湘人爱吃辣，可辣椒来中国其实才几百年。它老家在美洲，漂洋过海才来，从此把中国人的饭桌染红了。`,do:`想吃辣就吃点，今天对自己好一点。`},
+  {c:"shi",t:`四千年的面条`,b:`世界上最早的一碗面条，是在中国青海挖出来的，足足四千年。虽然早干硬了，那一根根的形状还看得清清楚楚。`,do:`中午煮碗面，加个荷包蛋。`},
+  {c:"shi",t:`会呼吸的鸡蛋`,b:`蛋壳上有上千个看不见的小孔，蛋是会「呼吸」的。所以别让它紧挨着味儿大的东西放，免得串了味。`,do:`整理一下冰箱，鸡蛋单独放好。`},
+  {c:"shi",t:`不会坏的蜂蜜`,b:`蜂蜜能放很久很久都不坏。考古时从几千年前的古墓里挖出的蜂蜜，据说还能吃，真是甜得长久。`,do:`冲一杯温温的蜂蜜水。`},
+  {c:"shi",t:`豆腐的来历`,b:`豆腐是咱们中国人发明的，相传跟淮南王炼丹时误打误撞有关。一块白白嫩嫩的豆腐，养活了多少代人。`,do:`今天做道豆腐菜。`},
+  {c:"shi",t:`越陈越香的醋`,b:`山西老陈醋要在缸里晒上一年，夏天晒太阳、冬天捞掉冰，水分越收越少，味儿越来越醇。`,do:`做菜时点几滴醋，提个鲜。`},
+  {c:"shi",t:`落花生`,b:`花生在地上开花，授完粉却一头扎进土里去结果，所以又叫「落花生」，是个老实又会藏的家伙。`,do:`抓一把花生当零嘴。`},
+
+  {c:"shu",t:`一场春日的聚会`,b:`王羲之的《兰亭序》被称作「天下第一行书」。写的是一群朋友春天在水边喝酒作诗的乐事，字也写得像那天一样舒坦。`,do:`拿支笔，随手写几个字，慢慢写。`},
+  {c:"shu",t:`东坡的苦中作乐`,b:`「日啖荔枝三百颗，不辞长作岭南人」——苏东坡这话听着潇洒，其实那会儿他正被贬岭南。日子苦，他偏要尝出甜来。`,do:`买点应季水果，坐下来好好吃。`},
+  {c:"shu",t:`胭脂的来历`,b:`姑娘脸上的胭脂，名字来自西北的焉支山。那儿曾长着能染红的花，匈奴人丢了这座山，还编歌谣来叹惜。`,do:`对镜子笑一个，你笑起来最好看。`},
+  {c:"shu",t:`好墨里有香气`,b:`上好的墨，做时要掺一点点珍珠粉和麝香。磨出来不光又黑又亮，凑近还有淡淡的香，难怪古人写字像在享受。`,do:`找张纸写写画画，记下今天的好心情。`},
+  {c:"shu",t:`画里的留白`,b:`中国画上常空着一大片，那不是没画完。空出来的是云、是水、是天，留给看画的人自己去想——这叫「留白」。`,do:`试着画点啥，留一大片白，不用画满。`},
+  {c:"shu",t:`照过古今的月亮`,b:`「床前明月光」，李白写这首诗时正一个人在外漂着。那轮月亮不稀奇，稀奇的是它照过千百年来每个想家的人。`,do:`给远方的家人发条消息，说一句想他了。`},
+  {c:"shu",t:`福字为啥倒着贴`,b:`过年福字倒着贴，图的是「福到（倒）了」的好彩头。老祖宗把盼头，都藏进了一个字的方向里。`,do:`想一想，今年你最盼的一桩好事。`},
+  {c:"shu",t:`十二生肖转一圈`,b:`十二个属相轮一圈，正好十二年。你属什么，那一年的故事，就都藏在这个小动物里了。`,do:`算一算家里每个人的属相。`},
+  {c:"shu",t:`对联别贴反了`,b:`对联讲究上下对仗。贴的时候，上联在右、下联在左，横批从右往左念，可别贴拧巴了。`,do:`念念家门口的对联，看看贴对没。`},
+  {c:"shu",t:`茶倒七分满`,b:`「茶满欺人」，给客人倒茶只倒七分，留下三分是情分。一杯茶里，藏着中国人待人的分寸。`,do:`给家人倒杯茶，记得七分满。`},
+
+  {c:"yang",t:`晒晒后背`,b:`天好的时候，背朝太阳坐一会儿，暖洋洋特别舒服。晒着晒着，身体会自己造出让骨头结实的养分，比吃药还自然。`,do:`搬个凳子，晒十分钟太阳。`},
+  {c:"yang",t:`笑是最省事的舒展`,b:`人一笑，脸上要动几十块肌肉，心里那股劲儿也跟着松开了。一分钱不花，却是最好的舒展。`,do:`给会逗你笑的人打个电话。`},
+  {c:"yang",t:`清晨一杯温水`,b:`睡了一整夜，身体悄悄「渴」了大半宿。早上起来不急不慌地慢慢喝杯温水，像先跟身体打个温柔的招呼。`,do:`现在就去倒一杯温水，慢慢喝。`},
+  {c:"yang",t:`饭后慢慢走`,b:`「饭后百步走」，是几千年前古人就琢磨明白的道理。不用快，慢慢溜达，看看花看看人，身心都松快。`,do:`吃完饭，出门慢慢走一圈。`},
+  {c:"yang",t:`睡觉是在修补自己`,b:`人这一辈子，差不多三分之一时间在睡。别小看它——身体正趁着夜里，悄悄把白天的劳累一点点补回来。`,do:`今晚早点歇，睡个好觉。`},
+  {c:"yang",t:`日梳百下`,b:`老话讲「日梳百下」。早上拿梳子从前往后慢慢梳一梳，头皮松快了，人也跟着精神。`,do:`拿梳子，慢慢梳几十下。`},
+  {c:"yang",t:`睡前泡泡脚`,b:`睡前用温水泡泡脚，脚暖了，全身都跟着暖和，人也容易睡得踏实安稳。`,do:`今晚烧壶热水，舒舒服服泡个脚。`},
+  {c:"yang",t:`烦时深呼吸`,b:`心里烦的时候，慢慢深吸一口气，再缓缓吐出来。一来一回几次，那股急火就消下去一半。`,do:`现在就试三次深呼吸。`},
+  {c:"yang",t:`抬头望望远`,b:`看手机看久了眼睛累。抬起头，望望远处的树和天，看那么一会儿，眼睛就缓过来了。`,do:`走到窗边，看会儿远处。`}
+];
+
+const FESTIVALS={"1-1":"春节快乐","1-15":"元宵节","2-2":"龙抬头","5-5":"端午安康","7-7":"七夕","7-15":"中元","8-15":"中秋团圆","9-9":"重阳","12-8":"腊八","12-23":"小年"};
+
+const lunarInfo=[0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
+0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
+0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
+0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
+0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,
+0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
+0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b5a0,0x195a6,
+0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,
+0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,
+0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,
+0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,
+0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,
+0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45];
+function leapMonth(y){return lunarInfo[y-1900]&0xf;}
+function leapDays(y){if(leapMonth(y))return((lunarInfo[y-1900]&0x10000)?30:29);return 0;}
+function monthDays(y,m){return(lunarInfo[y-1900]&(0x10000>>m))?30:29;}
+function lYearDays(y){let s=348;for(let i=0x8000;i>0x8;i>>=1){s+=(lunarInfo[y-1900]&i)?1:0;}return s+leapDays(y);}
+function solar2lunar(date){
+  const base=Date.UTC(1900,0,31);
+  let offset=Math.floor((Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())-base)/86400000);
+  let y=1900,temp=0;
+  for(;y<2050&&offset>0;y++){temp=lYearDays(y);offset-=temp;}
+  if(offset<0){offset+=temp;y--;}
+  const leap=leapMonth(y);let isLeap=false;let m=1;
+  for(;m<13&&offset>0;m++){
+    if(leap>0&&m===(leap+1)&&!isLeap){m--;isLeap=true;temp=leapDays(y);}
+    else{temp=monthDays(y,m);}
+    if(isLeap&&m===(leap+1))isLeap=false;
+    offset-=temp;
+  }
+  if(offset===0&&leap>0&&m===leap+1){if(isLeap){isLeap=false;}else{isLeap=true;m--;}}
+  if(offset<0){offset+=temp;m--;}
+  return {m,d:offset+1,isLeap};
+}
+const LD=['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+const LM=['正','二','三','四','五','六','七','八','九','十','十一','腊'];
+const WK=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+
+const now=new Date();
+const h=now.getHours();
+let greet="你好",sub="愿你今天，心里也有光";
+if(h<5){greet="夜深了";sub="还没睡呀，早点歇着";}
+else if(h<11){greet="早上好";sub="新的一天，慢慢来";}
+else if(h<14){greet="中午好";sub="记得好好吃顿饭";}
+else if(h<18){greet="下午好";sub="泡杯茶，歇一会儿";}
+else{greet="晚上好";sub="忙了一天，该松快松快了";}
+
+document.getElementById('greetWord').textContent=greet;
+document.getElementById('sub').textContent=sub;
+document.getElementById('momName').textContent=MOM_NAME;
+document.getElementById('signedBy').textContent=SIGNED_BY;
+document.getElementById('dDay').textContent=now.getDate();
+document.getElementById('dYM').innerHTML=now.getFullYear()+' 年<br>'+(now.getMonth()+1)+' 月';
+document.getElementById('dWeek').textContent=WK[now.getDay()];
+
+const lun=solar2lunar(now);
+document.getElementById('dLunar').textContent='农历 '+(lun.isLeap?'闰':'')+LM[lun.m-1]+'月'+LD[lun.d-1];
+const fkey=lun.m+'-'+lun.d;
+if(FESTIVALS[fkey]){document.getElementById('festWrap').innerHTML='<span class="festival">'+FESTIVALS[fkey]+'</span>';}
+if(PHOTO_URL){document.getElementById('photoFrame').innerHTML='<img src="'+PHOTO_URL+'" alt="全家福">';}
+
+function dayOfYear(d){return Math.floor((d-new Date(d.getFullYear(),0,0))/86400000);}
+const doy=dayOfYear(now);
+const serial=doy+(now.getFullYear()-2026)*366;  // 一个一直往前走的天数
+document.getElementById('word').textContent=WORDS_TO_MOM[((serial%WORDS_TO_MOM.length)+WORDS_TO_MOM.length)%WORDS_TO_MOM.length];
+
+/* 每转完一圈就重新洗牌，让顺序不固定、不显重复 */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffledOrder(n,seed){const arr=[...Array(n).keys()];const rnd=mulberry32(seed);for(let i=n-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+const cycle=Math.floor(serial/CARDS.length);
+const order=shuffledOrder(CARDS.length,cycle*2654435761>>>0);
+const posToday=((serial%CARDS.length)+CARDS.length)%CARDS.length;
+let idx=order[posToday];
+
+function applyAccent(c){const col=PALETTE[c];document.documentElement.style.setProperty('--accent',col);document.documentElement.style.setProperty('--accent-soft',col+'22');}
+function renderCard(){
+  const card=CARDS[idx];
+  document.getElementById('cat').textContent=CATNAME[card.c];
+  document.getElementById('cTitle').textContent=card.t;
+  document.getElementById('cBody').textContent=card.b;
+  document.getElementById('todoText').textContent=card.do;
+  const btn=document.getElementById('doneBtn');btn.classList.remove('done');btn.textContent='我做啦 ☺';btn.disabled=false;
+  document.getElementById('todoResp').classList.remove('show');document.getElementById('todoResp').textContent='';
+  applyAccent(card.c);
+}
+function swapTo(n){const sw=document.getElementById('cardSwap');sw.classList.add('out');setTimeout(()=>{idx=((n%CARDS.length)+CARDS.length)%CARDS.length;renderCard();sw.classList.remove('out');},300);}
+renderCard();
+document.getElementById('nextBtn').onclick=()=>swapTo(idx+1);
+document.getElementById('prevBtn').onclick=()=>swapTo(idx-1);
+document.getElementById('doneBtn').onclick=function(){
+  this.classList.add('done');this.textContent='做啦 ✓';
+  const r=document.getElementById('todoResp');
+  r.textContent=DONE_WORDS[Math.floor(Math.random()*DONE_WORDS.length)];
+  r.classList.add('show');
+};
+document.getElementById('photoFrame').onclick=()=>{if(!PHOTO_URL){document.getElementById('photoT').textContent='等我把全家福放进来 ☺';}};
+</script>
